@@ -14,7 +14,7 @@ from model_params_def import infer_params # [Req]
 
 filepath = Path(__file__).resolve().parent # [Req]
 
-def extract_subset_fea(df, fea_list: List, fea_sep: str='_'):
+def extract_subset_fea(df, fea_list, fea_sep='_'):
     """ Extract features based feature prefix name. """
     fea = [c for c in df.columns if (c.split(fea_sep)[0]) in fea_list]
     return df[fea]
