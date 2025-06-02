@@ -66,7 +66,7 @@ def run(params: Dict) -> Dict:
                 'early_stopping_rounds': params['patience']}
     
     model = xgb.XGBRegressor(objective='reg:squarederror', **xgb_args)
-    model.train(xtr, ytr, eval_set=[(xvl, yvl)])
+    model.fit(xtr, ytr, eval_set=[(xvl, yvl)])
 
 
     model.save_model(str(modelpath))
