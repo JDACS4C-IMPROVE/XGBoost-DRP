@@ -16,11 +16,6 @@ from model_params_def import train_params # [Req]
 
 filepath = Path(__file__).resolve().parent # [Req]
 
-def extract_subset_fea(df, fea_list, fea_sep='_'):
-    """ Extract features based feature prefix name. """
-    fea = [c for c in df.columns if (c.split(fea_sep)[0]) in fea_list]
-    return df[fea]
-
 # [Req]
 def run(params: Dict) -> Dict:
     # ------------------------------------------------------
@@ -41,21 +36,18 @@ def run(params: Dict) -> Dict:
     # ------------------------------------------------------
     # Load model input data (ML data)
     # ------------------------------------------------------
-    tr_data = pd.read_parquet(Path(params["input_dir"]) / train_data_fname)
-    vl_data = pd.read_parquet(Path(params["input_dir"]) / val_data_fname)
-
-    fea_list = ["ge", "mordred"]
-    fea_sep = "."
+    train_data = pd.read_parquet(Path(params["input_dir"]) / train_data_fname)
+    val_data = pd.read_parquet(Path(params["input_dir"]) / val_data_fname)
 
     # Train data
-    xtr = extract_subset_fea(tr_data, fea_list=fea_list, fea_sep=fea_sep)
-    ytr = tr_data[[params["y_col_name"]]]
+    ytr = train_data[[params["y_col_name"]]]
+    xtr = train_data.drop(columns=[params['y_col_name']])
     print("xtr:", xtr.shape)
     print("ytr:", ytr.shape)
 
     # Val data
-    xvl = extract_subset_fea(vl_data, fea_list=fea_list, fea_sep=fea_sep)
-    yvl = vl_data[[params["y_col_name"]]]
+    yvl = val_data[[params["y_col_name"]]]
+    xvl = val_data.drop(columns=[params['y_col_name']])
     print("xvl:", xvl.shape)
     print("yvl:", yvl.shape)
 

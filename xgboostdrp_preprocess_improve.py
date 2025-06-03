@@ -28,14 +28,16 @@ def run(params: Dict):
     # [Req] Determine preprocessing on training data
     # ------------------------------------------------------
     print("Load omics data.")
-    ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
+    omics = drp.get_x_data(file = params['cell_transcriptomic_file'], 
                                         benchmark_dir = params['input_dir'], 
                                         column_name = params['canc_col_name'])
+    omics_transform = params['cell_transcriptomic_transform']
 
     print("Load drug data.")
-    md = drp.get_x_data(file = params['drug_mordred_file'], 
+    drugs = drp.get_x_data(file = params['drug_mordred_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
+    drugs_transform = params['drug_mordred_transform']
 
     print("Load train response data.")
     response_train = drp.get_response_data(split_file=params["train_split_file"], 
@@ -43,14 +45,14 @@ def run(params: Dict):
                                    response_file=params['y_data_file'])
     
     print("Find intersection of training data.")
-    response_train = drp.get_response_with_features(response_train, ge, params['canc_col_name'])
-    response_train = drp.get_response_with_features(response_train, md, params['drug_col_name'])
-    ge_train = drp.get_features_in_response(ge, response_train, params['canc_col_name'])
-    md_train = drp.get_features_in_response(md, response_train, params['drug_col_name'])
+    response_train = drp.get_response_with_features(response_train, omics, params['canc_col_name'])
+    response_train = drp.get_response_with_features(response_train, drugs, params['drug_col_name'])
+    omics_train = drp.get_features_in_response(omics, response_train, params['canc_col_name'])
+    drugs_train = drp.get_features_in_response(drugs, response_train, params['drug_col_name'])
 
     print("Determine transformations.")
-    drp.determine_transform(ge_train, 'ge_transform', params['cell_transcriptomic_transform'], params['output_dir'])
-    drp.determine_transform(md_train, 'md_transform', params['drug_mordred_transform'], params['output_dir'])
+    drp.determine_transform(omics_train, 'omics_transform', omics_transform, params['output_dir'])
+    drp.determine_transform(drugs_train, 'drugs_transform', drugs_transform, params['output_dir'])
 
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
@@ -66,33 +68,28 @@ def run(params: Dict):
         response_stage = drp.get_response_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
                                 response_file=params['y_data_file'])
-        response_stage = drp.get_response_with_features(response_stage, ge, params['canc_col_name'])
-        response_stage = drp.get_response_with_features(response_stage, md, params['drug_col_name'])
-        ge_stage = drp.get_features_in_response(ge, response_stage, params['canc_col_name'])
-        md_stage = drp.get_features_in_response(md, response_stage, params['drug_col_name'])
+        response_stage = drp.get_response_with_features(response_stage, omics, params['canc_col_name'])
+        response_stage = drp.get_response_with_features(response_stage, drugs, params['drug_col_name'])
+        omics_stage = drp.get_features_in_response(omics, response_stage, params['canc_col_name'])
+        drugs_stage = drp.get_features_in_response(drugs, response_stage, params['drug_col_name'])
 
         print(f"Transform {stage} data.")
-        ge_stage = drp.transform_data(ge_stage, 'ge_transform', params['output_dir'])
-        md_stage = drp.transform_data(md_stage, 'md_transform', params['output_dir'])
-
-        # Prefix gene column names with "ge."
-        fea_sep = "."
-        fea_prefix = "ge"
-        ge_stage = ge_stage.rename(columns={fea: f"{fea_prefix}{fea_sep}{fea}" for fea in ge_stage.columns[1:]})
+        omics_stage = drp.transform_data(omics_stage, 'omics_transform', params['output_dir'])
+        drugs_stage = drp.transform_data(drugs_stage, 'drugs_transform', params['output_dir'])
 
         # [Req] Build data name
         data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
 
         print(f"Merge {stage} data")
-        data = response_stage.drop(columns=["study"]) # to_parquet() throws error since "study" contain mixed values
-        y_df_cols = data.columns.tolist()
-        data = data.merge(ge_stage, on=params["canc_col_name"], how="inner")
-        data = data.merge(md_stage, on=params["drug_col_name"], how="inner")
+        y_df_cols = response_stage.columns.tolist()
+        data = response_stage.merge(omics_stage, on=params["canc_col_name"], how="inner")
+        data = data.merge(drugs_stage, on=params["drug_col_name"], how="inner")
         data = data.sample(frac=1.0).reset_index(drop=True) # shuffle
 
         print(f"Save {stage} data")
-        
-        data.to_parquet(Path(params["output_dir"]) / data_fname) # saves ML data file to parquet
+        xdf = data.drop(columns=y_df_cols)
+        xdf[params['y_col_name']] = data[params['y_col_name']]
+        xdf.to_parquet(Path(params["output_dir"]) / data_fname) # saves ML data file to parquet
         
         # [Req] Save y dataframe for the current stage
         ydf = data[y_df_cols]

@@ -14,11 +14,6 @@ from model_params_def import infer_params # [Req]
 
 filepath = Path(__file__).resolve().parent # [Req]
 
-def extract_subset_fea(df, fea_list, fea_sep='_'):
-    """ Extract features based feature prefix name. """
-    fea = [c for c in df.columns if (c.split(fea_sep)[0]) in fea_list]
-    return df[fea]
-
 # [Req]
 def run(params: Dict) -> bool:
     # ------------------------------------------------------
@@ -29,13 +24,12 @@ def run(params: Dict) -> bool:
     # ------------------------------------------------------
     # Load model input data (ML data)
     # ------------------------------------------------------
-    te_data = pd.read_parquet(Path(params["input_data_dir"]) / test_data_fname)
-    fea_list = ["ge", "mordred"]
-    fea_sep = "."
+    test_data = pd.read_parquet(Path(params["input_data_dir"]) / test_data_fname)
 
     # Test data
-    xte = extract_subset_fea(te_data, fea_list=fea_list, fea_sep=fea_sep)
-    yte = te_data[[params["y_col_name"]]]
+    yte = test_data[[params["y_col_name"]]]
+    xte = test_data.drop(columns=[params['y_col_name']])
+
     print("xte:", xte.shape)
     print("yte:", yte.shape)
 
