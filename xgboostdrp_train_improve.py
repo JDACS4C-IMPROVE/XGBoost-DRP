@@ -55,6 +55,7 @@ def run(params: Dict) -> Dict:
     # Prepare, train, and save model
     # ------------------------------------------------------
     xgb_args = {'learning_rate': params['learning_rate'],
+                'n_estimators': params['epochs'],
                 'early_stopping_rounds': params['patience'],
                 'max_depth': params['max_depth'],
                 'min_child_weight': params['min_child_weight'],
