@@ -55,7 +55,15 @@ def run(params: Dict) -> Dict:
     # Prepare, train, and save model
     # ------------------------------------------------------
     xgb_args = {'learning_rate': params['learning_rate'],
-                'early_stopping_rounds': params['patience']}
+                'early_stopping_rounds': params['patience'],
+                'max_depth': params['max_depth'],
+                'min_child_weight': params['min_child_weight'],
+                'subsample': params['subsample'],
+                'colsample_bytree': params['colsample_bytree'],
+                'gamma': params['gamma'],
+                'lambda': params['lambda'],
+                'alpha': params['alpha'],
+                }
     
     model = xgb.XGBRegressor(objective='reg:squarederror', **xgb_args)
     model.fit(xtr, ytr, eval_set=[(xvl, yvl)])
