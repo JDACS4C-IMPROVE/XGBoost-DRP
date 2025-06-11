@@ -1,37 +1,30 @@
 import sys
 from pathlib import Path
-from typing import Dict
-
 import pandas as pd
-import xgboost as xgb
 
-# [Req] IMPROVE imports
-from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
-from improvelib.utils import str2bool
+# Core improvelib imports
 import improvelib.utils as frm
-from improvelib.metrics import compute_metrics
+# Application-specific (DRP) imports
+from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
 
 # Model-specifc imports
-from model_params_def import train_params # [Req]
+from model_params_def import train_params
+import xgboost as xgb
 
-filepath = Path(__file__).resolve().parent # [Req]
+filepath = Path(__file__).resolve().parent 
 
 # [Req]
-def run(params: Dict) -> Dict:
+def run(params):
     # ------------------------------------------------------
-    # [Req] Build model path
+    # [Req] Build model path and data names for train and val sets
     # ------------------------------------------------------
     modelpath = frm.build_model_path(
         model_file_name=params["model_file_name"],
         model_file_format=params["model_file_format"],
         model_dir=params["output_dir"]
     )
-
-    # ------------------------------------------------------
-    # [Req] Create data names for train and val sets
-    # ------------------------------------------------------
-    train_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="train")  # [Req]
-    val_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="val")  # [Req]
+    train_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="train")
+    val_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="val")
 
     # ------------------------------------------------------
     # Load model input data (ML data)
@@ -42,14 +35,10 @@ def run(params: Dict) -> Dict:
     # Train data
     ytr = train_data[[params["y_col_name"]]]
     xtr = train_data.drop(columns=[params['y_col_name']])
-    print("xtr:", xtr.shape)
-    print("ytr:", ytr.shape)
 
     # Val data
     yvl = val_data[[params["y_col_name"]]]
     xvl = val_data.drop(columns=[params['y_col_name']])
-    print("xvl:", xvl.shape)
-    print("yvl:", yvl.shape)
 
     # ------------------------------------------------------
     # Prepare, train, and save model

@@ -1,21 +1,20 @@
 import sys
 from pathlib import Path
-from typing import Dict
-
 import pandas as pd
-import xgboost as xgb
 
-# [Req] IMPROVE imports
-from improvelib.applications.drug_response_prediction.config import DRPInferConfig
+# Core improvelib imports
 import improvelib.utils as frm
+# Application-specific (DRP) imports
+from improvelib.applications.drug_response_prediction.config import DRPInferConfig
 
 # Model-specifc imports
-from model_params_def import infer_params # [Req]
+from model_params_def import infer_params
+import xgboost as xgb
 
-filepath = Path(__file__).resolve().parent # [Req]
+filepath = Path(__file__).resolve().parent
 
 # [Req]
-def run(params: Dict) -> bool:
+def run(params):
     # ------------------------------------------------------
     # [Req] Create data name for test set
     # ------------------------------------------------------

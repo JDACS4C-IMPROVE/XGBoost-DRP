@@ -5,9 +5,7 @@ If no params are required by the model, then it should be an empty list.
 
 from improvelib.utils import str2bool
 
-
 preprocess_params = []
-
 
 train_params = [
     {"name": "max_depth",
@@ -46,6 +44,5 @@ train_params = [
      "help": "Learning HP. L1 regularization term on weights. Increasing this value will make model more conservative Range [0, 1]."
     },
 ]
-
 
 infer_params = []

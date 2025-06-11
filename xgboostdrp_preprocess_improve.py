@@ -1,14 +1,11 @@
 import sys
 from pathlib import Path
-from typing import Dict
-
 import pandas as pd
 
-# [Req] IMPROVE imports
 # Core improvelib imports
-from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
 import improvelib.utils as frm
 # Application-specific (DRP) imports
+from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
 import improvelib.applications.drug_response_prediction.drp_utils as drp
 
 # Model-specifc imports
@@ -18,7 +15,7 @@ filepath = Path(__file__).resolve().parent
 
 
 # [Req]
-def run(params: Dict):
+def run(params):
     # ------------------------------------------------------
     # [Req] Validity check of feature representations
     # ------------------------------------------------------
