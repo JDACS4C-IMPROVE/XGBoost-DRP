@@ -17,6 +17,19 @@ filepath = Path(__file__).resolve().parent
 # [Req]
 def run(params):
     # ------------------------------------------------------
+    # [Req] Load feature data
+    # ------------------------------------------------------
+    print("Load omics data.")
+    omics = frm.get_x_data(file = params['cell_transcriptomic_file'], 
+                                        benchmark_dir = params['input_dir'], 
+                                        column_name = params['canc_col_name'])
+
+    print("Load drug data.")
+    drugs = frm.get_x_data(file = params['drug_mordred_file'], 
+                    benchmark_dir = params['input_dir'], 
+                    column_name = params['drug_col_name'])
+    
+    # ------------------------------------------------------
     # [Req] Validity check of feature representations
     # ------------------------------------------------------
     # not needed for this data/model
@@ -24,18 +37,6 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Determine preprocessing on training data
     # ------------------------------------------------------
-    print("Load omics data.")
-    omics = frm.get_x_data(file = params['cell_transcriptomic_file'], 
-                                        benchmark_dir = params['input_dir'], 
-                                        column_name = params['canc_col_name'])
-    omics_transform = params['cell_transcriptomic_transform']
-
-    print("Load drug data.")
-    drugs = frm.get_x_data(file = params['drug_mordred_file'], 
-                    benchmark_dir = params['input_dir'], 
-                    column_name = params['drug_col_name'])
-    drugs_transform = params['drug_mordred_transform']
-
     print("Load train response data.")
     response_train = frm.get_response_data(split_file=params["train_split_file"], 
                                    benchmark_dir=params['input_dir'], 
@@ -48,8 +49,8 @@ def run(params):
     drugs_train = frm.get_features_in_response(drugs, response_train, params['drug_col_name'])
 
     print("Determine transformations.")
-    frm.determine_transform(omics_train, 'omics_transform', omics_transform, params['output_dir'])
-    frm.determine_transform(drugs_train, 'drugs_transform', drugs_transform, params['output_dir'])
+    frm.determine_transform(omics_train, 'omics_transform', params['cell_transcriptomic_transform'], params['output_dir'])
+    frm.determine_transform(drugs_train, 'drugs_transform', params['drug_mordred_transform'], params['output_dir'])
 
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
