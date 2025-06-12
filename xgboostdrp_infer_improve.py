@@ -16,8 +16,11 @@ filepath = Path(__file__).resolve().parent
 # [Req]
 def run(params):
     # ------------------------------------------------------
-    # [Req] Create data name for test set
+    # [Req] Build model path and create data name for test set
     # ------------------------------------------------------
+    modelpath = frm.build_model_path(model_file_name=params["model_file_name"],
+                                     model_file_format=params["model_file_format"],
+                                     model_dir=params["input_model_dir"])
     test_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test")
 
     # ------------------------------------------------------
@@ -29,20 +32,10 @@ def run(params):
     yte = test_data[[params["y_col_name"]]]
     xte = test_data.drop(columns=[params['y_col_name']])
 
-    print("xte:", xte.shape)
-    print("yte:", yte.shape)
-
     # ------------------------------------------------------
     # Load best model and compute predictions
     # ------------------------------------------------------
-    # Build model path
-    modelpath = frm.build_model_path(
-        model_file_name=params["model_file_name"],
-        model_file_format=params["model_file_format"],
-        model_dir=params["input_model_dir"]
-    ) # [Req]
-
-    # Load LightGBM
+    # Load model
     model = xgb.XGBRegressor()
     model.load_model(str(modelpath))
 

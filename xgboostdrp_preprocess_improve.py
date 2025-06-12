@@ -25,31 +25,31 @@ def run(params):
     # [Req] Determine preprocessing on training data
     # ------------------------------------------------------
     print("Load omics data.")
-    omics = drp.get_x_data(file = params['cell_transcriptomic_file'], 
+    omics = frm.get_x_data(file = params['cell_transcriptomic_file'], 
                                         benchmark_dir = params['input_dir'], 
                                         column_name = params['canc_col_name'])
     omics_transform = params['cell_transcriptomic_transform']
 
     print("Load drug data.")
-    drugs = drp.get_x_data(file = params['drug_mordred_file'], 
+    drugs = frm.get_x_data(file = params['drug_mordred_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
     drugs_transform = params['drug_mordred_transform']
 
     print("Load train response data.")
-    response_train = drp.get_response_data(split_file=params["train_split_file"], 
+    response_train = frm.get_response_data(split_file=params["train_split_file"], 
                                    benchmark_dir=params['input_dir'], 
                                    response_file=params['y_data_file'])
     
     print("Find intersection of training data.")
-    response_train = drp.get_response_with_features(response_train, omics, params['canc_col_name'])
-    response_train = drp.get_response_with_features(response_train, drugs, params['drug_col_name'])
-    omics_train = drp.get_features_in_response(omics, response_train, params['canc_col_name'])
-    drugs_train = drp.get_features_in_response(drugs, response_train, params['drug_col_name'])
+    response_train = frm.get_response_with_features(response_train, omics, params['canc_col_name'])
+    response_train = frm.get_response_with_features(response_train, drugs, params['drug_col_name'])
+    omics_train = frm.get_features_in_response(omics, response_train, params['canc_col_name'])
+    drugs_train = frm.get_features_in_response(drugs, response_train, params['drug_col_name'])
 
     print("Determine transformations.")
-    drp.determine_transform(omics_train, 'omics_transform', omics_transform, params['output_dir'])
-    drp.determine_transform(drugs_train, 'drugs_transform', drugs_transform, params['output_dir'])
+    frm.determine_transform(omics_train, 'omics_transform', omics_transform, params['output_dir'])
+    frm.determine_transform(drugs_train, 'drugs_transform', drugs_transform, params['output_dir'])
 
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
@@ -62,17 +62,17 @@ def run(params):
     for stage, split_file in stages.items():
         print(f"Prepare data for stage {stage}.")
         print(f"Find intersection of {stage} data.")
-        response_stage = drp.get_response_data(split_file=split_file, 
+        response_stage = frm.get_response_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
                                 response_file=params['y_data_file'])
-        response_stage = drp.get_response_with_features(response_stage, omics, params['canc_col_name'])
-        response_stage = drp.get_response_with_features(response_stage, drugs, params['drug_col_name'])
-        omics_stage = drp.get_features_in_response(omics, response_stage, params['canc_col_name'])
-        drugs_stage = drp.get_features_in_response(drugs, response_stage, params['drug_col_name'])
+        response_stage = frm.get_response_with_features(response_stage, omics, params['canc_col_name'])
+        response_stage = frm.get_response_with_features(response_stage, drugs, params['drug_col_name'])
+        omics_stage = frm.get_features_in_response(omics, response_stage, params['canc_col_name'])
+        drugs_stage = frm.get_features_in_response(drugs, response_stage, params['drug_col_name'])
 
         print(f"Transform {stage} data.")
-        omics_stage = drp.transform_data(omics_stage, 'omics_transform', params['output_dir'])
-        drugs_stage = drp.transform_data(drugs_stage, 'drugs_transform', params['output_dir'])
+        omics_stage = frm.transform_data(omics_stage, 'omics_transform', params['output_dir'])
+        drugs_stage = frm.transform_data(drugs_stage, 'drugs_transform', params['output_dir'])
 
         # [Req] Build data name
         data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
