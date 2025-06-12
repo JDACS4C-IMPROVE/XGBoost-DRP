@@ -75,9 +75,6 @@ def run(params):
         omics_stage = frm.transform_data(omics_stage, 'omics_transform', params['output_dir'])
         drugs_stage = frm.transform_data(drugs_stage, 'drugs_transform', params['output_dir'])
 
-        # [Req] Build data name
-        data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
-
         print(f"Merge {stage} data")
         y_df_cols = response_stage.columns.tolist()
         data = response_stage.merge(omics_stage, on=params["canc_col_name"], how="inner")
@@ -87,8 +84,8 @@ def run(params):
         print(f"Save {stage} data")
         xdf = data.drop(columns=y_df_cols)
         xdf[params['y_col_name']] = data[params['y_col_name']]
-        xdf.to_parquet(Path(params["output_dir"]) / data_fname) # saves ML data file to parquet
-        
+        data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
+        xdf.to_parquet(Path(params["output_dir"]) / data_fname)
         # [Req] Save y dataframe for the current stage
         ydf = data[y_df_cols]
         frm.save_stage_ydf(ydf, stage, params["output_dir"])
