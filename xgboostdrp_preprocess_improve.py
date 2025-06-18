@@ -38,9 +38,9 @@ def run(params):
     # [Req] Determine preprocessing on training data
     # ------------------------------------------------------
     print("Load train response data.")
-    response_train = frm.get_response_data(split_file=params["train_split_file"], 
+    response_train = frm.get_y_data(split_file=params["train_split_file"], 
                                    benchmark_dir=params['input_dir'], 
-                                   response_file=params['y_data_file'])
+                                   y_data_file=params['y_data_file'])
     
     print("Find intersection of training data.")
     response_train = frm.get_response_with_features(response_train, omics, params['canc_col_name'])
@@ -63,9 +63,9 @@ def run(params):
     for stage, split_file in stages.items():
         print(f"Prepare data for stage {stage}.")
         print(f"Find intersection of {stage} data.")
-        response_stage = frm.get_response_data(split_file=split_file, 
+        response_stage = frm.get_y_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
-                                response_file=params['y_data_file'])
+                                y_data_file=params['y_data_file'])
         response_stage = frm.get_response_with_features(response_stage, omics, params['canc_col_name'])
         response_stage = frm.get_response_with_features(response_stage, drugs, params['drug_col_name'])
         omics_stage = frm.get_features_in_response(omics, response_stage, params['canc_col_name'])
