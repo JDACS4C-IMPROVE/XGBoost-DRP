@@ -43,10 +43,10 @@ def run(params):
                                    y_data_file=params['y_data_file'])
     
     print("Find intersection of training data.")
-    response_train = frm.get_response_with_features(response_train, omics, params['canc_col_name'])
-    response_train = frm.get_response_with_features(response_train, drugs, params['drug_col_name'])
-    omics_train = frm.get_features_in_response(omics, response_train, params['canc_col_name'])
-    drugs_train = frm.get_features_in_response(drugs, response_train, params['drug_col_name'])
+    response_train = frm.get_y_data_with_features(response_train, omics, params['canc_col_name'])
+    response_train = frm.get_y_data_with_features(response_train, drugs, params['drug_col_name'])
+    omics_train = frm.get_features_in_y_data(omics, response_train, params['canc_col_name'])
+    drugs_train = frm.get_features_in_y_data(drugs, response_train, params['drug_col_name'])
 
     print("Determine transformations.")
     frm.determine_transform(omics_train, 'omics_transform', params['cell_transcriptomic_transform'], params['output_dir'])
@@ -66,10 +66,10 @@ def run(params):
         response_stage = frm.get_y_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
                                 y_data_file=params['y_data_file'])
-        response_stage = frm.get_response_with_features(response_stage, omics, params['canc_col_name'])
-        response_stage = frm.get_response_with_features(response_stage, drugs, params['drug_col_name'])
-        omics_stage = frm.get_features_in_response(omics, response_stage, params['canc_col_name'])
-        drugs_stage = frm.get_features_in_response(drugs, response_stage, params['drug_col_name'])
+        response_stage = frm.get_y_data_with_features(response_stage, omics, params['canc_col_name'])
+        response_stage = frm.get_y_data_with_features(response_stage, drugs, params['drug_col_name'])
+        omics_stage = frm.get_features_in_y_data(omics, response_stage, params['canc_col_name'])
+        drugs_stage = frm.get_features_in_y_data(drugs, response_stage, params['drug_col_name'])
 
         print(f"Transform {stage} data.")
         omics_stage = frm.transform_data(omics_stage, 'omics_transform', params['output_dir'])
